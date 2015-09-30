@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block style_block %}
+{% end %}
+
+{% block menu %}
+{% include 'includes/nav.html' %} {# pull in navbar #}
+{% end %}
+
+{% block content %}
+<div class="container">
+    <h3>Let's go spot to ...</h3>
+    <div>
+        <a href="#" target="_blank" style="font-size:40px">xxx</a>
+        <br/>
+        <img src=""/>
+    </div>
+    <br/><br/>
+    <div>
+        <table>
+            <tr>
+                <td>
+                    <div class="message" style="width:300px">
+                        気に入ってもらえたかな？<br/>いい思い出を作ってきてね！
+                    </div>
+                </td>
+                <td>
+                    <img src="{{ static_url('image/icon_large.png') }}" style="width:100px;"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% end %}
+
+{% block tail_script %}
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="/static/js/result.js"></script>
+{% end %}

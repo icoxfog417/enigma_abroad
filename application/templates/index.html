@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block style_block %}
+<style>
+    div.submit{
+        width: 120px;
+        height: 120px;
+        padding: 5px;
+    }
+    div.submit:hover{
+        border: 1px solid silver;
+        border-radius: 10px;
+    }
+    .submit img{
+        width: 110px;
+        height: 110px;
+    }
+</style>
+{% end %}
+
+{% block menu %}
+{% include 'includes/nav.html' %} {# pull in navbar #}
+{% end %}
+
+{% block content %}
+<div class="container center-block">
+    <h1>Enigma Travel</h1>
+    <div>
+        <div style="width:60%; margin:auto">
+            <img src="{{ static_url('image/icon_large.png') }}" class="img-responsive"/>
+        </div>
+        <br/><br/>
+        <div>
+            <div id="message" class="message" style="max-width:380px; margin-right: auto; margin-left: auto;">
+                今回の旅行の予算を教えてね！
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div id="group">
+        <table style="margin-right: auto; margin-left: auto;">
+            <tr>
+                <td>
+                    <div class="submit" data-value="0">
+                        <img src="{{ static_url('image/budget_s.png') }}" title="1万円くらい"/>
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-2 submit" data-value="1">
+                        <img src="{{ static_url('image/budget_m.png') }}" title="3万円くらい">
+                    </div>
+                </td>
+                <td>
+                    <div class="col-md-2 submit" data-value="2">
+                        <img src="{{ static_url('image/budget_l.png') }}" title="8万円くらい">
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <div id="share" style="display:none">
+            <a id="url" href="" class="btn btn-info" role="button">わかった</a>
+            <span>
+                <script type="text/javascript" src="//media.line.me/js/line-button.js?v=20140411" ></script>
+                <script type="text/javascript">
+                    new media_line_me.LineButton({"pc":true,"lang":"ja","type":"a"});
+                </script>
+            </span>
+            {% raw xsrf_form_html() %}
+        </div>
+    </div>
+</div>
+{% end %}
+
+{% block tail_script %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+<script src="/static/js/index.js"></script>
+{% end %}

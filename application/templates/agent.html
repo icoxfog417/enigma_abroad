@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block style_block %}
+<style>
+    .vote{
+        width: 160px;
+    }
+</style>
+{% end %}
+
+{% block menu %}
+{% include 'includes/nav.html' %} {# pull in navbar #}
+{% end %}
+
+{% block content %}
+<div id="agent" class="container center-block">
+    <div style="width:100%">
+        <div style="width:400px; margin-left:auto; margin-right:auto">
+            <div style="width:300px;float:left;margin-right:10px">
+                <div id="message" class="message" data-v-text="comment">
+                </div>
+            </div>
+            <div style="float:right">
+                <img id="character" src="/static/image/icon_small.png" style="height:80px"/>
+            </div>
+            <br style="clear:both"/>
+        </div>
+    </div>
+    <div >
+        <div data-v-repeat="s in suggestions">
+            <div><h2 data-v-text="s.topic"></h2></div>
+            <div class="row">
+                <div data-v-repeat="c in s.candidates" data-v-attr="id: c.candidate_id" data-v-on="click: select(c)" class="col-md-4">
+                    <a data-v-attr="href: c.url" data-v-text="c.name"></a><br/>
+                    <img src="" data-v-attr="src: c.image" class="img-rounded img-responsive" />
+                    <!--
+                    <div data-v-text="c.description">
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/><br/>
+    <div style="width:100%">
+        <div style="width:400px; margin:auto">
+            <button id="dislike" class="btn btn-default vote" style="float:left" data-v-on="click: feedback(false)"><i class="fa fa-thumbs-down"></i></button>
+            <button id="like" class="btn btn-success vote"  style="float:right" data-v-on="click: feedback(true)"><i class="fa fa-thumbs-o-up"></i></button>
+            <br style="clear:both"/>
+            <button id="decide" class="btn btn-default" daata-v-on="click: decide">OK</button>
+        </div>
+        {% raw xsrf_form_html() %}
+    </div>
+</div>
+{% end %}
+
+{% block tail_script %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/vue/0.12.12/vue.min.js"></script>
+<script src="/static/js/agent.js"></script>
+{% end %}

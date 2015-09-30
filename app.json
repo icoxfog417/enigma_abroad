@@ -1,0 +1,13 @@
+{
+  "name": "Fashion Consultant Ashely",
+  "description": "Choose hair salons by conversation with Ashely",
+  "repository": "https://github.com/icoxfog417/ashely.git",
+  "keywords": ["python", "gensim", "tornado"],
+  "env": {
+    "BUILDPACK_URL": "https://github.com/kennethreitz/conda-buildpack",
+    "SECRET_TOKEN": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    }
+  }
+}
