@@ -7,26 +7,24 @@ import urllib.parse
 import requests
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
-def load_tours(api_key, page_size=100, limit=10000):
-    API_ROOT = "http://webservice.recruit.co.jp/ab-road/tour/v1/"
+def load_spots(api_key, page_size=100, limit=10000):
+    API_ROOT = "http://webservice.recruit.co.jp/ab-road/spot/v1/"
 
     def make_params(start):
         return {
             "key": api_key,
-            "order": 5,
-            "ad_type": "F",
             "start": start,
             "count": page_size,
             "format": "json"
         }
 
-    tours = []
+    spots = []
     index = 0
     timing = 10
     _limit = limit
     border = _limit / timing
     while index < _limit:
-        # fetch tours
+        # fetch spots
         p = make_params(index + 1)
         url = API_ROOT + "?" + urllib.parse.urlencode(p)
         resp = requests.get(url)
@@ -34,10 +32,10 @@ def load_tours(api_key, page_size=100, limit=10000):
         # retrieve results
         if resp.ok:
             body = resp.json()
-            if "results" in body and "tour" in body["results"]:
+            if "results" in body and "spot" in body["results"]:
                 results = body["results"]
-                tourjs = results["tour"]
-                count = len(tourjs)
+                spotjs = results["spot"]
+                count = len(spotjs)
                 page = index // page_size
                 max_count = int(results["results_available"])
                 if max_count < _limit:
@@ -45,8 +43,8 @@ def load_tours(api_key, page_size=100, limit=10000):
                     if index == 0:
                         border = _limit / timing
 
-                for tj in tourjs:
-                    tours.append(tj)
+                for sj in spotjs:
+                    spots.append(sj)
 
                 index += count
                 if index > border:
@@ -58,7 +56,7 @@ def load_tours(api_key, page_size=100, limit=10000):
         else:
             resp.raise_for_status()
 
-    return tours
+    return spots
 
 if __name__ == "__main__":
     # for command line tool
@@ -75,14 +73,14 @@ if __name__ == "__main__":
         path = os.path.join(os.path.dirname(__file__), "../data/")
 
     # extract data
-    tours = []
+    spots = []
     if args.limit < 0:
-        tours = load_tours(key)
+        spots = load_spots(key)
     else:
-        tours = load_tours(key, limit=args.limit)
+        spots = load_spots(key, limit=args.limit)
 
     # save as json file
-    j = json.dumps(tours, indent=2, ensure_ascii=False)
-    path = os.path.join(path, "tours.json")
+    j = json.dumps(spots, indent=2, ensure_ascii=False)
+    path = os.path.join(path, "spots.json")
     with open(path, "wb") as f:
         f.write(j.encode("utf-8"))

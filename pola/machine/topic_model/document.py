@@ -63,7 +63,7 @@ class Document():
             else:
                 index = -1
 
-        if index > -1:
+        if index > -1 and index in self.vocab:
             for i, a in enumerate(self.archives):
                 self.archives[i] = [ic for ic in a if ic[0] != index]
 
@@ -99,10 +99,44 @@ class Document():
         self.__compact()
 
     def cut_above(self, frequency):
-        target = [i for i in self.frequency.items() if i[1] >= frequency]
+        border = frequency
+        if 0 < frequency < 1:
+            border = len(self.archives) * frequency
 
+        target = [i for i in self.frequency.items() if i[1] >= border]
         for t in target:
             self.remove_vocab(t[0], compaction=False)
+
+        self.__compact()
+
+    def cut_frequent(self, frequency):
+        o = Counter()
+        for a in self.archives:
+            for f in a:
+                o[f[0]] += 1
+
+        target = [t for t in o.most_common() if t[1] / len(self.archives) >= frequency]
+        for t in target:
+            self.remove_vocab(t[0], compaction=False)
+
+        self.__compact()
+
+    def cut_pos(self, definition):
+        target = []
+        arr = lambda x: x if isinstance(x, (list, tuple)) else [x]
+        for v in self.vocab:
+            if "class1" in definition and self.vocab[v].class1 in arr(definition["class1"]):
+                target.append(v)
+            if "class2" in definition and self.vocab[v].class2 in arr(definition["class2"]):
+                target.append(v)
+            if "class3" in definition and self.vocab[v].class3 in arr(definition["class3"]):
+                target.append(v)
+            elif "pos" in definition and self.vocab[v].pos in arr(definition["pos"]):
+                target.append(v)
+
+        for v in target:
+            self.remove_vocab(v, compaction=False)
+
         self.__compact()
 
     def split(self, right_rate_or_size=0.3, compact=True):
@@ -177,14 +211,18 @@ class Document():
     def vocab_keys(self):
         return self.vocab.keys()
 
-    def show_vocab(self, limit=-1):
+    def show_vocab(self, limit=-1, show_pos=False):
         target = sorted(self.frequency.items(), reverse=True, key=lambda f: f[1])
         if limit > 0:
             target = target[:limit] + target[-limit:]
 
         counter = 0
         for k, v in target:
-            print(self.vocab[k].surface, v)
+            p = self.vocab[k].surface
+            if show_pos:
+                p += "(" + ",".join([self.vocab[k].pos, self.vocab[k].class1, self.vocab[k].class2, self.vocab[k].class3]) + ")"
+
+            print(p, v)
             counter += 1
             if counter == limit:
                 print("----------(top {0} / under {0})----------".format(limit))

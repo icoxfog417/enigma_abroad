@@ -4,7 +4,7 @@ import os
 import argparse
 import json
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-from application.models.salon import Salon
+from application.models.spot import CitySpots
 from pola.machine.topic_model.resource import PickleResource
 
 if __name__ == "__main__":
@@ -16,20 +16,15 @@ if __name__ == "__main__":
     # load tours data
     path = args.path
     if not path:
-        path = os.path.join(os.path.dirname(__file__), "../data/tours.json")
-    tours = Tour.load(path)
+        path = os.path.join(os.path.dirname(__file__), "../data/spots.json")
+    cityspots = CitySpots.load(path)
 
     # save as document
-    tour_doc = Tour.to_doc(tours)
-    mood_doc = Tour.to_mood_doc(tours)
+    cityspots_doc = CitySpots.to_doc(cityspots)
 
-    print("show tours corpus")
-    tour_doc.show_vocab(limit=20)
+    print("show city spots corpus")
+    cityspots_doc.show_vocab(limit=20)
 
-    print("show mood's corpus")
-    mood_doc.show_vocab(limit=20)
-
-    for d in [("tour", tour_doc), ("mood", mood_doc)]:
-        doc_path = os.path.join(os.path.dirname(args.path), "./" + d[0] + "_doc.pickle")
-        p = PickleResource(doc_path)
-        p.save(d[1])
+    doc_path = os.path.join(os.path.dirname(path), "./cityspots_doc.pickle")
+    p = PickleResource(doc_path)
+    p.save(cityspots_doc)
