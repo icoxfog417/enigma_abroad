@@ -7,26 +7,26 @@ import urllib.parse
 import requests
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
-def load_salons(api_key, page_size=20, limit=10000):
-    API_ROOT = "http://webservice.recruit.co.jp/beauty/salon/v1/"
+def load_tours(api_key, page_size=100, limit=10000):
+    API_ROOT = "http://webservice.recruit.co.jp/ab-road/tour/v1/"
 
     def make_params(start):
         return {
             "key": api_key,
-            "order": 3,
-            "address": "東京",
+            "order": 5,
+            "ad_type": "F",
             "start": start,
             "count": page_size,
             "format": "json"
         }
 
-    salons = []
+    tours = []
     index = 0
     timing = 10
     _limit = limit
     border = _limit / timing
     while index < _limit:
-        # fetch salons
+        # fetch tours
         p = make_params(index + 1)
         url = API_ROOT + "?" + urllib.parse.urlencode(p)
         resp = requests.get(url)
@@ -34,9 +34,10 @@ def load_salons(api_key, page_size=20, limit=10000):
         # retrieve results
         if resp.ok:
             body = resp.json()
-            if "results" in body and "salon" in body["results"]:
+            if "results" in body and "tour" in body["results"]:
                 results = body["results"]
-                count = int(results["results_returned"])
+                tourjs = results["tour"]
+                count = len(tourjs)
                 page = index // page_size
                 max_count = int(results["results_available"])
                 if max_count < _limit:
@@ -44,9 +45,8 @@ def load_salons(api_key, page_size=20, limit=10000):
                     if index == 0:
                         border = _limit / timing
 
-                # parse json to salon object
-                for sj in results["salon"]:
-                    salons.append(sj)
+                for tj in tourjs:
+                    tours.append(tj)
 
                 index += count
                 if index > border:
@@ -58,33 +58,31 @@ def load_salons(api_key, page_size=20, limit=10000):
         else:
             resp.raise_for_status()
 
-    return salons
+    return tours
 
 if __name__ == "__main__":
     # for command line tool
-    parser = argparse.ArgumentParser(description="Download data from hotpepper beauty api.")
-    parser.add_argument("path", type=str, help="path of data folder.")
+    parser = argparse.ArgumentParser(description="Download data from recruit ab-road api.")
+    parser.add_argument("key", type=str, help="key for recruit api.")
+    parser.add_argument("--path", type=str, default="", help="path of data folder.")
     parser.add_argument("--limit", type=int, default=-1, help="cut under the n count word.")
     args = parser.parse_args()
 
     # preparation
+    key = args.key
     path = args.path
-    key = {}
-    key_file_path = os.path.join(os.path.dirname(__file__), "../key.json")
-    with open(key_file_path, "r", encoding="utf-8") as f:
-        key = json.load(f)
-
-    api_key = key["api_key"]
+    if not path:
+        path = os.path.join(os.path.dirname(__file__), "../data/")
 
     # extract data
-    salons = []
+    tours = []
     if args.limit < 0:
-        salons = load_salons(api_key)
+        tours = load_tours(key)
     else:
-        salons = load_salons(api_key, limit=args.limit)
+        tours = load_tours(key, limit=args.limit)
 
     # save as json file
-    j = json.dumps(salons, indent=2, ensure_ascii=False)
-    path = os.path.join(args.path, "salons.json")
+    j = json.dumps(tours, indent=2, ensure_ascii=False)
+    path = os.path.join(path, "tours.json")
     with open(path, "wb") as f:
         f.write(j.encode("utf-8"))
