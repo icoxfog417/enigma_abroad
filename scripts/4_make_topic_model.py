@@ -52,5 +52,9 @@ if __name__ == "__main__":
 
             print("\t epoch{0}: perplexity = {1}".format(e, p))
 
-    print("model is created. perplexity is {0}/{1} (training/test)".format(model.perplexity(), model.perplexity(test)))
+    print(
+        "model is created. topics={0}, perplexity is {1}/{2} (training/test)".format(
+            model.topic_count, model.perplexity(), model.perplexity(test))
+    )
+
     model.save()

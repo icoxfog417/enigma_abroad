@@ -121,8 +121,8 @@ class CitySpots(Candidate):
         for s in spots:
             if s.city.code not in city_dict:
                 city_dict[s.city.code] = CitySpots(s)
-
-            city_dict[s.city.code].spots.append(s)
+            else:
+                city_dict[s.city.code].spots.append(s)
 
         city_spots = [v for v in city_dict.values()]
         return city_spots

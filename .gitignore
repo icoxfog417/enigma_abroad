@@ -67,6 +67,7 @@ target/
 *.iml
 *.iws
 
+.ipynb_checkpoints
 venv
 data/*
 !data/ignores.txt
