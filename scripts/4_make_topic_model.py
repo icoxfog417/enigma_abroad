@@ -13,7 +13,7 @@ if __name__ == "__main__":
     parser.add_argument("topics", type=int, help="number of topics.")
     parser.add_argument("--till", type=int, help="upper number of topics.")
     parser.add_argument("--path", type=str, help="path to corpus pickle file.")
-    parser.add_argument("--iter", type=int, default=5000, help="number of training iteration.")
+    parser.add_argument("--iter", type=int, default=100, help="number of training iteration.")
     parser.add_argument("--burn", type=int, default=1000, help="number of burn.")
     parser.add_argument("--epoch", type=int, default=10, help="number of epoch.")
 
