@@ -106,7 +106,7 @@ class CitySpots(Candidate):
     def to_doc(cls, candidates, lang="ja"):
         descs = []
         for c in candidates:
-            descs += [s.title + " " + s.description for s in c.spots]
+            descs.append("\n".join([s.title + " " + s.description for s in c.spots]))
         return Document.load_docs(descs, lang=lang)
 
     @classmethod
