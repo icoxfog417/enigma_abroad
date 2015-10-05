@@ -32,7 +32,6 @@ class TCandidate(Candidate):
 
 
 class TestConversation(unittest.TestCase):
-    SPOTS_STORE = "spots.txt"
 
     def test_conversation(self):
         from pola.machine.topic_model import TopicModel
@@ -69,12 +68,6 @@ class TestConversation(unittest.TestCase):
                     self.assertNotEqual(c.history[-1].topic, c.history[-2].topic)
 
     def create_candidates(self):
-        """
-        from trip advisor
-        http://www.tripadvisor.co.uk/TravelersChoice-Destinations-cTop-g1
-        :return:
-        """
-
         # a,b is similar topic, c,d is similar topic (and different from a,b)
         data = [
             (0, "a", "aaa bbb bbb bbb aaa aaa aaa"),

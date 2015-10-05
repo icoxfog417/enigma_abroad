@@ -19,6 +19,15 @@ if __name__ == "__main__":
         path = os.path.join(os.path.dirname(__file__), "../data/spots.json")
     cityspots = CitySpots.load(path)
 
+    # create city information data
+    cityspotsj = []
+    for cs in cityspots:
+        j = {
+            "id": cs.city.code,
+            "spots": [s.code for s in cs.spots]
+        }
+        cityspotsj.append(j)
+
     # save as document
     cityspots_doc = CitySpots.to_doc(cityspots)
 
@@ -28,3 +37,9 @@ if __name__ == "__main__":
     doc_path = os.path.join(os.path.dirname(path), "./cityspots_doc.pickle")
     p = PickleResource(doc_path)
     p.save(cityspots_doc)
+
+    # save as json file
+    j = json.dumps(cityspotsj, indent=2, ensure_ascii=False)
+    data_path = os.path.join(os.path.dirname(path), "./cityspots.json")
+    with open(data_path, "wb") as f:
+        f.write(j.encode("utf-8"))
