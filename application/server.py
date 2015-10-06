@@ -23,9 +23,9 @@ class Application(tornado.web.Application):
             xsrf_cookies=True,
             debug=True,
         )
-        data_path = os.path.join(os.path.dirname(__file__), "../data/spots.json")
-        model_path = os.path.join(os.path.dirname(__file__), "../data/cityspots_doc_edited_model.gensim")
-        AgentHandler.load_brain(data_path, model_path)
+
+        data_dir = os.path.join(os.path.dirname(__file__), "../data/release")
+        AgentHandler.load_brain(data_dir)
 
         tornado.web.Application.__init__(self, handlers, **settings)
 

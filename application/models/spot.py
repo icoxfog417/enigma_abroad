@@ -19,6 +19,19 @@ class Item():
         )
         return item
 
+    def serialize(self):
+        return self.__dict__
+
+    def _sub_serialize(self):
+        j = {}
+        d = self.__dict__
+        for k in d:
+            if isinstance(d[k], Item):
+                j[k] = d[k].serialize()
+            else:
+                j[k] = d[k]
+        return j
+
 
 class City(Item):
 
@@ -28,6 +41,7 @@ class City(Item):
         self.area = area
         self.lat = float(lat)
         self.lng = float(lng)
+        self.raw = {}
 
     @classmethod
     def deserialize(cls, serialized):
@@ -40,14 +54,14 @@ class City(Item):
                     j["lat"],
                     j["lng"],
                     name_en=base.name_en)
-
+        city.raw = serialized
         return city
 
-    def __hash__(self):
-        return hash((self.code, self.name))
-
-    def __eq__(self, other):
-        return (self.code, self.name) == (other.code, other.name)
+    def serialize(self):
+        if self.raw:
+            return self.raw
+        else:
+            return self._sub_serialize()
 
 
 class Spot(Item):
@@ -63,6 +77,7 @@ class Spot(Item):
         self.lat = -1 if not lat else float(lat)
         self.lng = -1 if not lng else float(lng)
         self.map_scale = -1 if not map_scale else float(map_scale)
+        self.raw = {}
 
     @classmethod
     def deserialize(cls, serialized):
@@ -85,22 +100,39 @@ class Spot(Item):
                     j["map_scale"],
                     name_en=base.name_en)
 
+        spot.raw = serialized
+
         return spot
+
+    def serialize(self):
+        if self.raw:
+            return self.raw
+        else:
+            return self._sub_serialize()
 
 
 class CitySpots(Candidate):
 
-    def __init__(self, spot):
-        super(CitySpots, self).__init__(spot.city.code)
-        self.city = spot.city
-        self.spots = [spot]
+    def __init__(self, city=None, spot=None):
+        if city:
+            super(CitySpots, self).__init__(city.code)
+            self.city = city
+            self.spots = []
+        else:
+            super(CitySpots, self).__init__(spot.city.code)
+            self.city = spot.city
+            self.spots = [spot]
 
     @classmethod
     def deserialize(cls, serialized):
         raise Exception("You can't create CitySpot by deserialize")
 
     def serialize(self):
-        raise Exception("You can't serialize CitySpot")
+        s = {
+            "city": self.city.serialize(),
+            "spots": [s.serialize() for s in self.spots]
+        }
+        return s
 
     @classmethod
     def to_doc(cls, candidates, lang="ja"):
@@ -120,7 +152,7 @@ class CitySpots(Candidate):
 
         for s in spots:
             if s.city.code not in city_dict:
-                city_dict[s.city.code] = CitySpots(s)
+                city_dict[s.city.code] = CitySpots(spot=s)
             else:
                 city_dict[s.city.code].spots.append(s)
 
@@ -130,3 +162,40 @@ class CitySpots(Candidate):
     def __str__(self):
         string = "{0}:{1}".format(self.candidate_id, self.city.name)
         return string
+
+
+class CitySpotIds(Candidate):
+
+    def __init__(self, city_id, spot_ids=()):
+        super(CitySpotIds, self).__init__(city_id)
+        self.spot_ids = [] if len(spot_ids) == 0 else spot_ids
+
+    @classmethod
+    def deserialize(cls, serialized):
+        csi = CitySpotIds(
+            serialized["id"],
+            [i for i in serialized["spots"]],
+        )
+        return csi
+
+    def serialize(self):
+        j = {
+            "id": self.candidate_id,
+            "spots": self.spot_ids
+        }
+        return j
+
+    @classmethod
+    def to_doc(cls, candidates, lang="ja"):
+        raise Exception("CitySpotIds is not used to create document.")
+
+    @classmethod
+    def load(cls, path):
+        import json
+        cityspotids = []
+
+        with open(path, "r", encoding="utf-8") as f:
+            js = json.load(f)
+            cityspotids = [CitySpotIds.deserialize(j) for j in js]
+
+        return cityspotids

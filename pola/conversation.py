@@ -29,6 +29,7 @@ class Suggestion():
     def __str__(self):
         return "{0} -> topic={1} suggest={2}".format(self.reaction, self.topic, ",".join([str(s) for s in self.candidate_ids]))
 
+
 class Conversation():
 
     def __init__(self, model, candidates, initial_topic=-1):

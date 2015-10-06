@@ -70,6 +70,7 @@ target/
 .ipynb_checkpoints
 venv
 data/*
+!data/release/
 !data/ignores.txt
 tests/data
 key.json

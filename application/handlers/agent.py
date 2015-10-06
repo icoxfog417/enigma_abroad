@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import tornado.web
-from application.models.salon import Salon
+from application.service.abroad import Abroad
+from application.models.spot import CitySpotIds
 from pola.machine.topic_model import GTopicModel
 from pola.conversation import Conversation, Reaction
 import json
@@ -29,18 +30,32 @@ class AgentBase(tornado.web.RequestHandler):
         history.append(hs)
         self.set_secure_cookie(self.CONVERSATION_KEY, json.dumps(history))
 
+
 class AgentIndexHandler(AgentBase):
 
     def get(self, group_id):
         self.set_secure_cookie(self.CONVERSATION_KEY, json.dumps([]))
         self.render("agent.html")
 
+
 class AgentHandler(AgentBase):
     BRAIN = None
 
     @classmethod
-    def load_brain(cls, data_path, model_path):
-        cls.BRAIN = Conversation.load(GTopicModel, model_path, Salon, data_path)
+    def load_brain(cls, data_dir):
+        import os
+
+        data_file = ""
+        model_file = ""
+
+        for f in sorted(os.listdir(data_dir)):
+            if not data_file and os.path.splitext(f)[1] == ".json":
+                data_file = os.path.join(data_dir, f)
+            elif not model_file and os.path.splitext(f)[1] == ".gensim":
+                model_file = os.path.join(data_dir, f)
+
+        if data_file and model_file:
+            cls.BRAIN = Conversation.load(GTopicModel, model_file, CitySpotIds, data_file)
 
     def get_brain(self):
         h = self.get_history()
@@ -71,6 +86,7 @@ class AgentHandler(AgentBase):
         :param group_key:
         :return:
         """
+
         candidate_id = self.get_argument("candidate_id", default="")
         is_like = self.get_argument("is_like", default="false")
         feedback = Reaction.positive
@@ -84,11 +100,23 @@ class AgentHandler(AgentBase):
         brain = self.get_brain()
         candidates = brain.suggest(feedback, count=3)
         suggest = brain.history[-1]
+
+        ab = Abroad()
         r = suggest.serialize()
-        r["candidates"] = [c.serialize() for c in candidates]
+
+        def load(c):
+            cs = ab.load_city_spots(c)
+            tours = ab.get_tour(cs.city.code)
+            s = cs.serialize()
+            s["tours"] = tours
+            return s
+
+        cities = [load(c) for c in candidates]
+        r["candidates"] = [c for c in cities if len(c["tours"]) > 0]
         self.add_history(suggest)
 
         return r
+
 
 class ResultHandler(AgentHandler):
 
