@@ -75,7 +75,7 @@ var agent = new Vue({
             var self = this;
             var params = {
               "_xsrf": G.getXsrf(),
-              "candidate_id": self.candidate_id,
+              "candidate_id": self.selected.city.code,
               "is_like": isLike
             };
             // $("#spot").hide("slide", {direction: "left"}, "slow");
@@ -95,7 +95,9 @@ function initMap(){
     MAP = new google.maps.Map(document.getElementById('map'), {
         zoom: 6
     });
-    showSpots(agent.selected);
+    if(agent.selected != null){
+        showSpots(agent.selected);
+    }
 }
 
 function setMarkers(map){
