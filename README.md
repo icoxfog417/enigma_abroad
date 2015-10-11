@@ -2,7 +2,7 @@
 
 Enigma Abroad is your partner for considering where to go on the vacation!
 
-The conversation logic is based on topic model. It is implemented in the package that named as  `[pola](https://github.com/icoxfog417/enigma_abroad/tree/master/pola)`.
+The conversation logic is based on topic model. It is implemented in the package that named as  [pola](https://github.com/icoxfog417/enigma_abroad/tree/master/pola).
 
 # Installation
 
