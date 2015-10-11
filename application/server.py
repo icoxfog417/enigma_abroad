@@ -4,6 +4,7 @@ import tornado.options
 import tornado.web
 import os.path
 from application.handlers import GroupHandler, AgentIndexHandler, AgentHandler, ResultHandler
+from keyenv import get_api_key
 
 
 class Application(tornado.web.Application):
@@ -22,6 +23,7 @@ class Application(tornado.web.Application):
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             xsrf_cookies=True,
             debug=True,
+            api_key=get_api_key()
         )
 
         data_dir = os.path.join(os.path.dirname(__file__), "../data/release")

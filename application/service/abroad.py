@@ -5,17 +5,8 @@ import requests
 class Abroad():
     URL_FORMAT = "http://webservice.recruit.co.jp/ab-road/{0}/v1/"
 
-    def __init__(self):
-        import os
-        self.api_key = os.environ.get("RECRUIT_API_KEY")
-
-        if not self.api_key:
-            keyfile = os.path.join(os.path.dirname(__file__), "../../key.json")
-            if os.path.isfile(keyfile):
-                import json
-                with open(keyfile, "r", encoding="utf-8") as f:
-                    key_json = json.load(f)
-                    self.api_key = key_json["api_key"]
+    def __init__(self, api_key):
+        self.api_key = api_key
 
     def get_city(self, city_code):
         from application.models.spot import City

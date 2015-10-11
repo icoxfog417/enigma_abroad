@@ -101,7 +101,7 @@ class AgentHandler(AgentBase):
         candidates = brain.suggest(feedback, count=3)
         suggest = brain.history[-1]
 
-        ab = Abroad()
+        ab = Abroad(self.application.settings["api_key"])
         r = suggest.serialize()
 
         def load(c):
